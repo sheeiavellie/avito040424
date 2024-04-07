@@ -21,9 +21,9 @@ func main() {
 
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /user_banner", handlers.HandleTODO)
-	router.HandleFunc("GET /banner", handlers.HandleTODO)
-	router.HandleFunc("POST /banner", handlers.HandleTODO)
+	router.HandleFunc("GET /user_banner", handlers.HandleGetUserBanner)
+	router.HandleFunc("GET /banner", handlers.HandleGetBanner)
+	router.HandleFunc("POST /banner", handlers.HandlePostBanner)
 	router.HandleFunc("PATCH /banner/{id}", handlers.HandleTODO)
 	router.HandleFunc("DELETE /banner/{id}", handlers.HandleTODO)
 
