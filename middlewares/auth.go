@@ -42,7 +42,8 @@ func ValidateToken(
 			return
 		}
 
-		if hasRoleOrAdmin(token.Role, requiredRole.GetName()) {
+		if !hasRoleOrAdmin(token.Role, requiredRole.GetName()) {
+			err := fmt.Errorf("wrong role, access forbidden")
 			log.Printf("an error occur at ValidateToken: %s", err)
 			util.SerHTTPErrorForbidden(w)
 			return
