@@ -34,8 +34,8 @@ func AuthorizeToken(
 			return
 		}
 
-		var token *data.Token
-		err = json.Unmarshal(tokenStr, token)
+		var token data.Token
+		err = json.Unmarshal(tokenStr, &token)
 		if err != nil {
 			log.Printf("an error occur at ValidateToken: %s", err)
 			util.SerHTTPErrorInternalServerError(w)
