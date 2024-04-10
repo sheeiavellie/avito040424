@@ -13,7 +13,7 @@ import (
 	"github.com/sheeiavellie/avito040424/util"
 )
 
-func ValidateToken(
+func AuthorizeToken(
 	next http.HandlerFunc,
 	requiredRole api.AccessRole,
 ) http.HandlerFunc {
