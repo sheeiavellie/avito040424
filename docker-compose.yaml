@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+
+  database:
+    container_name: database
+    image: postgres:16.1-alpine
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: ${PS_USER}
+      POSTGRES_PASSWORD: ${PS_PASSWORD}
+
+  cache:
+    container_name: cache
+    image: redis:7.2.4-alpine
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
