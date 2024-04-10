@@ -1,8 +1,8 @@
 package api
 
 var (
-	AdminRole = accessRole{name: "admin"}
-	UserRole  = accessRole{name: "user"}
+	AdminRole = &accessRole{name: "admin"}
+	UserRole  = &accessRole{name: "user"}
 )
 
 type AccessRole interface {
