@@ -8,6 +8,25 @@ import (
 )
 
 type Storage interface {
+	GetBanners(
+		ctx context.Context,
+		filter *data.AdminBannerFilter,
+	) ([]data.Banner, error)
+
+	CreateBanner(
+		ctx context.Context,
+		banner *data.Banner,
+	) error
+
+	UpdateBanner(
+		ctx context.Context,
+		bannerID int,
+	) error
+
+	DeleteBanner(
+		ctx context.Context,
+		bannerID int,
+	) error
 }
 
 type CacheStorage interface {
