@@ -11,6 +11,14 @@ type Storage interface {
 }
 
 type CacheStorage interface {
-	GetBanner(ctx context.Context, bannerKey hash.Hash32) (*data.Banner, error)
-	SetBanner(ctx context.Context, banner *data.Banner) error
+	GetBanner(
+		ctx context.Context,
+		bannerKey hash.Hash32,
+	) (*data.Banner, error)
+
+	SetBanner(
+		ctx context.Context,
+		bannerKey hash.Hash32,
+		banner *data.Banner,
+	) error
 }
