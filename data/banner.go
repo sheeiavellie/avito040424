@@ -14,3 +14,9 @@ type AdminBannerRequest struct {
 	Limit     int   `schema:"limit,default:10"`
 	Offset    int   `schema:"offset,default:10"`
 }
+
+type Banner struct {
+	Title string `json:"title"`
+	Text  string `json:"text"`
+	URL   string `json:"url"`
+}
