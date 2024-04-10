@@ -22,6 +22,9 @@ func (ps *PostgresStorage) Close() error {
 	return fmt.Errorf("error closing db: %w", err)
 }
 
+// If you're going to use tx.Exec() or tx.ExecContext()
+//
+// return nil as *sql.Rows
 func (ps *PostgresStorage) execTx(
 	ctx context.Context,
 	opts *sql.TxOptions,
