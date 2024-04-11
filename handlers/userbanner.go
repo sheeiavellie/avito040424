@@ -6,11 +6,12 @@ import (
 
 	"github.com/gorilla/schema"
 	"github.com/sheeiavellie/avito040424/data"
+	"github.com/sheeiavellie/avito040424/storage"
 	"github.com/sheeiavellie/avito040424/util"
 )
 
 func HandleGetUserBanner(
-	amogus string,
+	storage storage.Storage,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
