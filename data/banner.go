@@ -8,6 +8,11 @@ type UserBannerRequest struct {
 	UseLastRevision bool  `schema:"use_last_revision,default:false"`
 }
 
+type UserBannerFilter struct {
+	FeatureID int   `schema:"feature_id,required"`
+	TagIDs    []int `schema:"tag_id,required"`
+}
+
 type AdminBannerFilter struct {
 	FeatureID int   `schema:"feature_id,required"`
 	TagIDs    []int `schema:"tag_id,required"`
