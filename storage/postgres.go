@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/sheeiavellie/avito040424/data"
@@ -13,8 +14,26 @@ type PostgresStorage struct {
 	db *sql.DB
 }
 
-func NewPostgresStorage() *PostgresStorage {
-	return &PostgresStorage{}
+func NewPostgresStorage(
+	ctx context.Context,
+	connStr string,
+) (*PostgresStorage, error) {
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		return nil, fmt.Errorf("error opening postgres: %w", err)
+	}
+
+	ctxPing, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	err = db.PingContext(ctxPing)
+	if err != nil {
+		return nil, fmt.Errorf("error pinging postgres: %w", err)
+	}
+
+	return &PostgresStorage{
+		db: db,
+	}, nil
 }
 
 func (ps *PostgresStorage) Close() error {
