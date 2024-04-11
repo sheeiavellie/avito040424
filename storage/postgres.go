@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"github.com/sheeiavellie/avito040424/data"
 )
 
@@ -88,7 +88,7 @@ func (ps *PostgresStorage) GetBanner(
 		ctx,
 		query,
 		filter.FeatureID,
-		filter.TagIDs,
+		pq.Array(filter.TagIDs),
 	).Scan(&banner.Title, &banner.Text, &banner.URL)
 	if err != nil {
 		return nil, err
