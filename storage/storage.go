@@ -13,6 +13,11 @@ type Storage interface {
 		filter *data.AdminBannerFilter,
 	) ([]data.Banner, error)
 
+	GetBanner(
+		ctx context.Context,
+		filter *data.UserBannerFilter,
+	) (*data.Banner, error)
+
 	CreateBanner(
 		ctx context.Context,
 		banner *data.Banner,
