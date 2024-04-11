@@ -14,15 +14,18 @@ const (
 	lruTTL = 5 * time.Minute
 )
 
-type LocalLRUStorage struct {
+type LRUCacheStorage struct {
 	cache *expirable.LRU[hash.Hash32, data.Banner]
 }
 
-func NewLocalLRUStorage(size int) *expirable.LRU[hash.Hash32, data.Banner] {
-	return expirable.NewLRU[hash.Hash32, data.Banner](size, nil, lruTTL)
+func NewLRUCacheStorage(size int) *LRUCacheStorage {
+	cache := expirable.NewLRU[hash.Hash32, data.Banner](size, nil, lruTTL)
+	return &LRUCacheStorage{
+		cache: cache,
+	}
 }
 
-func (ls *LocalLRUStorage) GetBanner(
+func (ls *LRUCacheStorage) GetBanner(
 	ctx context.Context,
 	bannerKey hash.Hash32,
 ) (*data.Banner, error) {
@@ -35,7 +38,7 @@ func (ls *LocalLRUStorage) GetBanner(
 	return &banner, nil
 }
 
-func (ls *LocalLRUStorage) SetBanner(
+func (ls *LRUCacheStorage) SetBanner(
 	ctx context.Context,
 	bannerKey hash.Hash32,
 	banner *data.Banner,
