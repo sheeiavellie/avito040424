@@ -1,6 +1,29 @@
 package handlers
 
-import "net/http"
+import (
+	"log"
+	"net/http"
 
-func HandleGetUserBanner(w http.ResponseWriter, r *http.Request) {
+	"github.com/gorilla/schema"
+	"github.com/sheeiavellie/avito040424/data"
+	"github.com/sheeiavellie/avito040424/util"
+)
+
+func HandleGetUserBanner(
+	amogus string,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			log.Printf("an error occur at HandleGetUserBanner: %s", err)
+			util.SerHTTPErrorInternalServerError(w)
+			return
+		}
+
+		var bannerRequest data.UserBannerRequest
+		if err := schema.NewDecoder().Decode(&bannerRequest, r.Form); err != nil {
+			log.Printf("an error occur at HandleGetUserBanner: %s", err)
+			util.SerHTTPErrorBadRequest(w)
+			return
+		}
+	}
 }
