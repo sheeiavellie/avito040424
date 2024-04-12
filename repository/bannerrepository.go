@@ -51,7 +51,10 @@ func (br *bannerRepository) GetBanner(
 		}
 	}
 
-	banner, err := br.storage.GetBanner(ctx, &data.UserBannerFilter{})
+	banner, err := br.storage.GetBanner(ctx, &data.UserBannerFilter{
+		FeatureID: bannerRequest.FeatureID,
+		TagIDs:    bannerRequest.TagIDs,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("can't get banner from storage: %w", err)
 	}

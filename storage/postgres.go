@@ -91,7 +91,7 @@ func (ps *PostgresStorage) GetBanner(
 		pq.Array(filter.TagIDs),
 	).Scan(&banner.Title, &banner.Text, &banner.URL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	return &banner, nil
