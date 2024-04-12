@@ -16,6 +16,19 @@ type bannerRepository struct {
 	cache   storage.CacheStorage
 }
 
+func NewBannerRepository(
+	storage storage.Storage,
+	cache storage.CacheStorage,
+) *bannerRepository {
+	return &bannerRepository{
+		storage: storage,
+		cache:   cache,
+	}
+}
+
+func (br *bannerRepository) Close() {
+}
+
 // TODO: Think more about do we really need to create key every time
 func (br *bannerRepository) GetBanner(
 	ctx context.Context,
