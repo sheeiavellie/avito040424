@@ -2,15 +2,9 @@ package storage
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/sheeiavellie/avito040424/data"
-)
-
-const (
-	lruTTL = 5 * time.Minute
 )
 
 type LRUCacheStorage struct {
@@ -18,7 +12,7 @@ type LRUCacheStorage struct {
 }
 
 func NewLRUCacheStorage(size int) *LRUCacheStorage {
-	cache := expirable.NewLRU[string, data.Banner](size, nil, lruTTL)
+	cache := expirable.NewLRU[string, data.Banner](size, nil, 0)
 	return &LRUCacheStorage{
 		cache: cache,
 	}
