@@ -11,6 +11,7 @@ import (
 	"github.com/sheeiavellie/avito040424/api"
 	"github.com/sheeiavellie/avito040424/handlers"
 	"github.com/sheeiavellie/avito040424/middlewares"
+	"github.com/sheeiavellie/avito040424/repository"
 	"github.com/sheeiavellie/avito040424/storage"
 )
 
@@ -24,7 +25,7 @@ func main() {
 
 	port := os.Getenv("PORT")
 	psConnStr := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s",
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		os.Getenv("PS_USER"),
 		os.Getenv("PS_PASSWORD"),
 		os.Getenv("HOST"),
@@ -42,6 +43,10 @@ func main() {
 	}
 	defer postgresStorage.Close()
 
+	lruCache := storage.NewLRUCacheStorage(100)
+
+	bannerRepo := repository.NewBannerRepository(postgresStorage, lruCache)
+
 	// routing
 	router := http.NewServeMux()
 
@@ -49,7 +54,8 @@ func main() {
 		"GET /user_banner",
 		middlewares.AuthorizeToken(
 			handlers.HandleGetUserBanner(
-				postgresStorage,
+				ctx,
+				bannerRepo,
 			),
 			api.UserRole,
 		),
