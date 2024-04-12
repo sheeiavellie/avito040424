@@ -27,21 +27,16 @@ func NewLRUCacheStorage(size int) *LRUCacheStorage {
 func (ls *LRUCacheStorage) GetBanner(
 	ctx context.Context,
 	bannerKey string,
-) (*data.Banner, error) {
+) (*data.Banner, bool) {
 	banner, ok := ls.cache.Get(bannerKey)
-	if !ok {
-		err := fmt.Errorf("value is not cached")
-		return nil, err
-	}
-
-	return &banner, nil
+	return &banner, ok
 }
 
+// TODO: Refactor method signature to know if value was added
 func (ls *LRUCacheStorage) SetBanner(
 	ctx context.Context,
 	bannerKey string,
 	banner *data.Banner,
-) error {
-	ls.cache.Add(bannerKey, *banner)
-	return nil
+) bool {
+	return ls.cache.Add(bannerKey, *banner)
 }

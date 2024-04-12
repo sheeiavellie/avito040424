@@ -37,11 +37,11 @@ type CacheStorage interface {
 	GetBanner(
 		ctx context.Context,
 		bannerKey string,
-	) (*data.Banner, error)
+	) (*data.Banner, bool)
 
 	SetBanner(
 		ctx context.Context,
 		bannerKey string,
 		banner *data.Banner,
-	) error
+	) bool
 }
