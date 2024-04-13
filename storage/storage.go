@@ -7,19 +7,20 @@ import (
 )
 
 type Storage interface {
+	GetBannerContent(
+		ctx context.Context,
+		featureID int,
+		tagIDs []int,
+	) (*data.BannerContent, error)
+
 	GetBanners(
 		ctx context.Context,
-		filter *data.AdminBannerFilter,
+		filter *data.BannerFilter,
 	) ([]data.Banner, error)
-
-	GetBanner(
-		ctx context.Context,
-		filter *data.UserBannerFilter,
-	) (*data.Banner, error)
 
 	CreateBanner(
 		ctx context.Context,
-		banner *data.Banner,
+		banner *data.BannerContent,
 	) error
 
 	UpdateBanner(
@@ -37,11 +38,11 @@ type CacheStorage interface {
 	GetBanner(
 		ctx context.Context,
 		bannerKey string,
-	) (*data.Banner, bool)
+	) (*data.BannerContent, bool)
 
 	SetBanner(
 		ctx context.Context,
 		bannerKey string,
-		banner *data.Banner,
+		banner *data.BannerContent,
 	) bool
 }
