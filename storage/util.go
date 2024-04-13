@@ -8,4 +8,5 @@ var (
 	ErrorBannerAlreadyExist    = fmt.Errorf(
 		"banner with given feature and tags already exists",
 	)
+	ErrorBannerDontExist = fmt.Errorf("banner dotsn't exists")
 )
