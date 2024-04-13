@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/schema"
 	"github.com/sheeiavellie/avito040424/data"
@@ -92,9 +93,9 @@ func HandlePostBanner(
 			log.Printf("an error occur at HandlePostBanner: %s", err)
 			switch {
 			case errors.Is(err, storage.ErrorFeatureOrTagDontExist):
-				util.SerHTTPErrorBadRequest(w)
+				util.SerHTTPErrorNotFound(w)
 			case errors.Is(err, storage.ErrorBannerAlreadyExist):
-				util.SerHTTPErrorBadRequest(w)
+				util.SerHTTPErrorConflict(w)
 			default:
 				util.SerHTTPErrorInternalServerError(w)
 			}
@@ -104,7 +105,7 @@ func HandlePostBanner(
 		bannerRes := data.CreateBannerResponse{BannerID: bannerID}
 		err = util.WriteJSON(w, http.StatusCreated, bannerRes)
 		if err != nil {
-			log.Printf("an error occur at HandleGetBanners: %s", err)
+			log.Printf("an error occur at HandlePostBanner: %s", err)
 			util.SerHTTPErrorInternalServerError(w)
 			return
 		}
@@ -116,6 +117,30 @@ func HandleDeleteBanner(
 	bannerRepo repository.BannerRepository,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		bannerIDStr := r.PathValue("id")
+		bannerID, err := strconv.Atoi(bannerIDStr)
+		if err != nil || bannerID <= 0 {
+			log.Printf("an error occur at HandleDeleteBanner: %s", err)
+			util.SerHTTPErrorBadRequest(w)
+			return
+		}
+
+		if err := bannerRepo.DeleteBanner(ctx, bannerID); err != nil {
+			switch {
+			case errors.Is(err, storage.ErrorBannerDontExist):
+				util.SerHTTPErrorNotFound(w)
+			default:
+				util.SerHTTPErrorInternalServerError(w)
+			}
+			return
+		}
+
+		err = util.WriteJSON(w, http.StatusNoContent, "Banner was deleted")
+		if err != nil {
+			log.Printf("an error occur at HandleDeleteBanners: %s", err)
+			util.SerHTTPErrorInternalServerError(w)
+			return
+		}
 	}
 }
 
