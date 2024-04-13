@@ -59,3 +59,7 @@ type BannerRequest struct {
 	Content   BannerContent `json:"content"`
 	IsActive  bool          `json:"is_active"`
 }
+
+type CreateBannerResponse struct {
+	BannerID int `json:"banner_id"`
+}
