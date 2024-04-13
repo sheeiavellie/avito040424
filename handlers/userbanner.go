@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/schema"
 	"github.com/sheeiavellie/avito040424/data"
 	"github.com/sheeiavellie/avito040424/repository"
+	"github.com/sheeiavellie/avito040424/storage"
 	"github.com/sheeiavellie/avito040424/util"
 )
 
@@ -37,7 +39,12 @@ func HandleGetUserBanner(
 		)
 		if err != nil {
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			switch {
+			case errors.Is(err, storage.ErrorBannerIsNotActive):
+				util.SerHTTPErrorConflict(w)
+			default:
+				util.SerHTTPErrorInternalServerError(w)
+			}
 			return
 		}
 
