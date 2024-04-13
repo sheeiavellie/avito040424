@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/lib/pq"
@@ -99,7 +100,53 @@ func (ps *PostgresStorage) GetBanners(
 	ctx context.Context,
 	filter *data.BannerFilter,
 ) ([]data.Banner, error) {
-	return nil, nil
+	query := `
+    SELECT * FROM banners 
+    WHERE feature_id = ANY($1) AND $2 <@ tag_ids
+    ORDER BY id
+    LIMIT $3 OFFSET $4;`
+
+	res, err := ps.db.QueryContext(
+		ctx,
+		query,
+		pq.Array(filter.FeatureIDs),
+		pq.Array(filter.TagIDs),
+		filter.Limit,
+		filter.Offset,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %w", err)
+	}
+	defer res.Close()
+
+	banners := make([]data.Banner, 0, filter.Limit)
+
+	for res.Next() {
+		var banner data.Banner
+		if err := res.Scan(
+			&banner.ID,
+			&banner.FeatureID,
+			pq.Array(&banner.TagIDs),
+			&banner.Content.Title,
+			&banner.Content.Text,
+			&banner.Content.URL,
+			&banner.CreatedAt,
+			&banner.UpdatedAt,
+			&banner.IsActive,
+		); err != nil {
+			log.Printf("%s", fmt.Errorf("error scanning result: %w", err))
+		}
+		banners = append(banners, banner)
+	}
+
+	if rerr := res.Close(); rerr != nil {
+		return nil, fmt.Errorf("error closing result: %w", err)
+	}
+	if err := res.Err(); err != nil {
+		return nil, fmt.Errorf("error scanning result: %w", err)
+	}
+
+	return banners, nil
 }
 
 func (ps *PostgresStorage) CreateBanner(
