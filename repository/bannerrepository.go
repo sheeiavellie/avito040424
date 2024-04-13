@@ -67,5 +67,9 @@ func (br *bannerRepository) GetBanners(
 	ctx context.Context,
 	filter *data.BannerFilter,
 ) ([]data.Banner, error) {
-	return nil, nil
+	banners, err := br.storage.GetBanners(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("can't get banners from storage: %w", err)
+	}
+	return banners, nil
 }
