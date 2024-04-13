@@ -102,7 +102,8 @@ func (ps *PostgresStorage) GetBanners(
 ) ([]data.Banner, error) {
 	query := `
     SELECT * FROM banners 
-    WHERE feature_id = ANY($1) AND $2 <@ tag_ids
+    WHERE (ARRAY[feature_id] <@ $1 OR ARRAY[feature_id] @> $1) 
+    AND $2 <@ tag_ids
     ORDER BY id
     LIMIT $3 OFFSET $4;`
 
