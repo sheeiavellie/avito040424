@@ -2,14 +2,15 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
-	"slices"
 
 	"github.com/gorilla/schema"
 	"github.com/sheeiavellie/avito040424/data"
 	"github.com/sheeiavellie/avito040424/repository"
+	"github.com/sheeiavellie/avito040424/storage"
 	"github.com/sheeiavellie/avito040424/util"
 )
 
@@ -88,15 +89,24 @@ func HandlePostBanner(
 			bannerReq.IsActive,
 		)
 		if err != nil {
-
+			log.Printf("an error occur at HandlePostBanner: %s", err)
+			switch {
+			case errors.Is(err, storage.ErrorFeatureOrTagDontExist):
+				util.SerHTTPErrorBadRequest(w)
+			case errors.Is(err, storage.ErrorBannerAlreadyExist):
+				util.SerHTTPErrorBadRequest(w)
+			default:
+				util.SerHTTPErrorInternalServerError(w)
+			}
+			return
 		}
 
-		err = util.WriteJSON(w, http.StatusOK, bannerID)
+		bannerRes := data.CreateBannerResponse{BannerID: bannerID}
+		err = util.WriteJSON(w, http.StatusCreated, bannerRes)
 		if err != nil {
 			log.Printf("an error occur at HandleGetBanners: %s", err)
 			util.SerHTTPErrorInternalServerError(w)
 			return
 		}
-
 	}
 }
