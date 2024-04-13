@@ -11,5 +11,6 @@ type BannerRepository interface {
 		ctx context.Context,
 		featureID int,
 		tagIDs []int,
+		useLastRevision bool,
 	) (*data.BannerContent, error)
 }
