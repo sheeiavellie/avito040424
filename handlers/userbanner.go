@@ -29,7 +29,11 @@ func HandleGetUserBanner(
 			return
 		}
 
-		banner, err := bannerRepo.GetBanner(ctx, &bannerRequest)
+		banner, err := bannerRepo.GetBanner(
+			ctx,
+			bannerRequest.FeatureID,
+			bannerRequest.TagIDs,
+		)
 		if err != nil {
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)
 			util.SerHTTPErrorInternalServerError(w)
