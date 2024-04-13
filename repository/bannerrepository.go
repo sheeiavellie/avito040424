@@ -26,9 +26,6 @@ func NewBannerRepository(
 	}
 }
 
-func (br *bannerRepository) Close() {
-}
-
 // TODO: Think more about do we really need to create key every time
 func (br *bannerRepository) GetBanner(
 	ctx context.Context,
