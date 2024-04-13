@@ -150,11 +150,77 @@ func (ps *PostgresStorage) GetBanners(
 	return banners, nil
 }
 
+// Returns zero and non-nil error if smth went wrong
+// Index in DB can't be less than 1
 func (ps *PostgresStorage) CreateBanner(
 	ctx context.Context,
-	banner *data.BannerContent,
-) error {
-	return nil
+	featureID int,
+	tagIDs []int,
+	content *data.BannerContent,
+	isActive bool,
+) (int, error) {
+
+	checkQuery := `
+     SELECT
+    (
+        NOT EXISTS (
+            SELECT $1 EXCEPT
+            SELECT id FROM features
+        )
+        AND
+        NOT EXISTS (
+            SELECT unnest($2::int[]) EXCEPT
+            SELECT id FROM tags
+        )
+    ) AS ok;`
+
+	insertQuery := `
+    INSERT INTO banners VALUES
+    ($1, $2, $3, $4, $5, $6, $6, $7)
+    RETURNING id;`
+
+	var createdBannerID int
+	err := ps.execTx(
+		ctx,
+		&sql.TxOptions{Isolation: sql.LevelReadCommitted},
+		func(tx *sql.Tx) error {
+			var ok bool
+			err := tx.QueryRowContext(
+				ctx,
+				checkQuery,
+				featureID,
+				pq.Array(tagIDs),
+			).Scan(&ok)
+			if err != nil {
+				return err
+			}
+
+			if ok {
+				curTime := time.Now()
+				err = tx.QueryRowContext(
+					ctx,
+					insertQuery,
+					featureID,
+					pq.Array(tagIDs),
+					content.Title,
+					content.Text,
+					content.URL,
+					curTime,
+					isActive,
+				).Scan(&createdBannerID)
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return 0, fmt.Errorf("error creating banner: %w", err)
+	}
+
+	return 0, nil
 }
 
 func (ps *PostgresStorage) UpdateBanner(
