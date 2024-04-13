@@ -106,5 +106,10 @@ func (br *bannerRepository) DeleteBanner(
 	ctx context.Context,
 	bannerID int,
 ) error {
+	err := br.storage.DeleteBanner(ctx, bannerID)
+	if err != nil {
+		return fmt.Errorf("can't delete banner: %w", err)
+	}
+
 	return nil
 }
