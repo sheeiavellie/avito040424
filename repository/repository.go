@@ -13,4 +13,9 @@ type BannerRepository interface {
 		tagIDs []int,
 		useLastRevision bool,
 	) (*data.BannerContent, error)
+
+	GetBanners(
+		ctx context.Context,
+		filter *data.BannerFilter,
+	) ([]data.Banner, error)
 }

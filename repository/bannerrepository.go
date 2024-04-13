@@ -62,3 +62,10 @@ func (br *bannerRepository) GetBannerContent(
 
 	return banner, nil
 }
+
+func (br *bannerRepository) GetBanners(
+	ctx context.Context,
+	filter *data.BannerFilter,
+) ([]data.Banner, error) {
+	return nil, nil
+}
