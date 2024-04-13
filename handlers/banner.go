@@ -125,16 +125,16 @@ func HandleDeleteBanner(
 			return
 		}
 
-		//if err := bannerRepo.DeleteBanner(ctx, bannerID); err != nil {
-		//	log.Printf("an error occur at HandleDeleteBanner: %s", err)
-		//	switch {
-		//	case errors.Is(err, storage.ErrorBannerDontExist):
-		//		util.SerHTTPErrorNotFound(w)
-		//	default:
-		//		util.SerHTTPErrorInternalServerError(w)
-		//	}
-		//	return
-		//}
+		if err := bannerRepo.DeleteBanner(ctx, bannerID); err != nil {
+			log.Printf("an error occur at HandleDeleteBanner: %s", err)
+			switch {
+			case errors.Is(err, storage.ErrorBannerDontExist):
+				util.SetHTTPErrorNotFound(w)
+			default:
+				util.SetHTTPErrorInternalServerError(w)
+			}
+			return
+		}
 
 		util.SetHTTPStatusNoContent(w)
 	}
