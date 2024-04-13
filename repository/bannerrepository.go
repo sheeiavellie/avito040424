@@ -27,31 +27,34 @@ func NewBannerRepository(
 }
 
 // TODO: Think more about do we really need to create key every time
-func (br *bannerRepository) GetBanner(
+func (br *bannerRepository) GetBannerContent(
 	ctx context.Context,
-	bannerRequest *data.UserBannerRequest,
-) (*data.Banner, error) {
+	featureID int,
+	tagIDs []int,
+	useLastRevision bool,
+) (*data.BannerContent, error) {
 
 	var bannerKeyBuffer strings.Builder
 
-	bannerKeyBuffer.WriteString(strconv.Itoa(bannerRequest.FeatureID))
-	slices.Sort(bannerRequest.TagIDs)
+	bannerKeyBuffer.WriteString(strconv.Itoa(featureID))
+	slices.Sort(tagIDs)
 
-	for _, e := range bannerRequest.TagIDs {
+	for _, e := range tagIDs {
 		bannerKeyBuffer.WriteString(strconv.Itoa(e))
 	}
 	bannerKey := bannerKeyBuffer.String()
 
-	if !bannerRequest.UseLastRevision {
+	if !useLastRevision {
 		if banner, ok := br.cache.GetBanner(ctx, bannerKey); ok {
 			return banner, nil
 		}
 	}
 
-	banner, err := br.storage.GetBanner(ctx, &data.UserBannerFilter{
-		FeatureID: bannerRequest.FeatureID,
-		TagIDs:    bannerRequest.TagIDs,
-	})
+	banner, err := br.storage.GetBannerContent(
+		ctx,
+		featureID,
+		tagIDs,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("can't get banner from storage: %w", err)
 	}

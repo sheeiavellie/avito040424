@@ -41,7 +41,6 @@ func (ps *PostgresStorage) Close() error {
 	return fmt.Errorf("error closing db: %w", err)
 }
 
-// # Performs transaction
 func (ps *PostgresStorage) execTx(
 	ctx context.Context,
 	opts *sql.TxOptions,
@@ -68,27 +67,21 @@ func (ps *PostgresStorage) execTx(
 	return nil
 }
 
-func (ps *PostgresStorage) GetBanners(
+func (ps *PostgresStorage) GetBannerContent(
 	ctx context.Context,
-	filter *data.AdminBannerFilter,
-) ([]data.Banner, error) {
-	return nil, nil
-}
-
-func (ps *PostgresStorage) GetBanner(
-	ctx context.Context,
-	filter *data.UserBannerFilter,
-) (*data.Banner, error) {
+	featureID int,
+	tagIDs []int,
+) (*data.BannerContent, error) {
 	query := `
     SELECT title, text, url FROM banners WHERE feature_id = $1 AND
     (tag_ids <@ $2 and tag_ids @> $2);`
 
-	var banner data.Banner
+	var banner data.BannerContent
 	err := ps.db.QueryRowContext(
 		ctx,
 		query,
-		filter.FeatureID,
-		pq.Array(filter.TagIDs),
+		featureID,
+		pq.Array(tagIDs),
 	).Scan(&banner.Title, &banner.Text, &banner.URL)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
@@ -97,9 +90,16 @@ func (ps *PostgresStorage) GetBanner(
 	return &banner, nil
 }
 
+func (ps *PostgresStorage) GetBanners(
+	ctx context.Context,
+	filter *data.BannerFilter,
+) ([]data.Banner, error) {
+	return nil, nil
+}
+
 func (ps *PostgresStorage) CreateBanner(
 	ctx context.Context,
-	banner *data.Banner,
+	banner *data.BannerContent,
 ) error {
 	return nil
 }

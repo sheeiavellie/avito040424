@@ -8,11 +8,11 @@ import (
 )
 
 type LRUCacheStorage struct {
-	cache *expirable.LRU[string, data.Banner]
+	cache *expirable.LRU[string, data.BannerContent]
 }
 
 func NewLRUCacheStorage(size int) *LRUCacheStorage {
-	cache := expirable.NewLRU[string, data.Banner](size, nil, 0)
+	cache := expirable.NewLRU[string, data.BannerContent](size, nil, 0)
 	return &LRUCacheStorage{
 		cache: cache,
 	}
@@ -21,7 +21,7 @@ func NewLRUCacheStorage(size int) *LRUCacheStorage {
 func (ls *LRUCacheStorage) GetBanner(
 	ctx context.Context,
 	bannerKey string,
-) (*data.Banner, bool) {
+) (*data.BannerContent, bool) {
 	banner, ok := ls.cache.Get(bannerKey)
 	return &banner, ok
 }
@@ -30,7 +30,7 @@ func (ls *LRUCacheStorage) GetBanner(
 func (ls *LRUCacheStorage) SetBanner(
 	ctx context.Context,
 	bannerKey string,
-	banner *data.Banner,
+	banner *data.BannerContent,
 ) bool {
 	return ls.cache.Add(bannerKey, *banner)
 }
