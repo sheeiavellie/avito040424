@@ -110,3 +110,19 @@ func HandlePostBanner(
 		}
 	}
 }
+
+func HandleDeleteBanner(
+	ctx context.Context,
+	bannerRepo repository.BannerRepository,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+func HandlePatchBanner(
+	ctx context.Context,
+	bannerRepo repository.BannerRepository,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
