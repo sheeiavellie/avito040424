@@ -58,7 +58,10 @@ func (br *bannerRepository) GetBannerContent(
 	if err != nil {
 		return nil, fmt.Errorf("can't get banner from storage: %w", err)
 	}
-	_ = br.cache.SetBanner(ctx, bannerKey, banner)
+
+	go func() {
+		_ = br.cache.SetBanner(ctx, bannerKey, banner)
+	}()
 
 	return banner, nil
 }
@@ -98,6 +101,10 @@ func (br *bannerRepository) CreateBanner(
 func (br *bannerRepository) UpdateBanner(
 	ctx context.Context,
 	bannerID int,
+	featureID int,
+	tagIDs []int,
+	content *data.BannerContent,
+	isActive bool,
 ) error {
 	return nil
 }
