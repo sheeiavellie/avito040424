@@ -249,7 +249,7 @@ func (ps *PostgresStorage) DeleteBanner(
 	checkQuery := `
     SELECT true FROM banners WHERE id = $1;`
 
-	deleteQuery := `DELETE FROM banners WHERE id = $1;`
+	deleteQuery := `DELETE FROM banners WHERE id = $1 RETURNING id;`
 
 	var deletedBannerID int
 	err := ps.execTx(
