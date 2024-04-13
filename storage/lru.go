@@ -26,7 +26,8 @@ func (ls *LRUCacheStorage) GetBanner(
 	return &banner, ok
 }
 
-// TODO: Refactor method signature to know if value was added
+// Refactor method signature to know if value was added
+// Someday later, don't really need that kind of thing now
 func (ls *LRUCacheStorage) SetBanner(
 	ctx context.Context,
 	bannerKey string,

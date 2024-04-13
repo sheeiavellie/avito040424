@@ -27,6 +27,12 @@ func NewBannerRepository(
 }
 
 // TODO: Think more about do we really need to create key every time
+// It mb good to start cooking key when request was parsed
+// It can be done with gorutine and channel:
+// add string channel
+// as soon as request was parsed, start gorutine
+// write result into channel and get it here
+
 func (br *bannerRepository) GetBannerContent(
 	ctx context.Context,
 	featureID int,
