@@ -80,8 +80,26 @@ func main() {
 			api.AdminRole,
 		),
 	)
-	router.HandleFunc("PATCH /banner/{id}", handlers.HandleTODO)
-	router.HandleFunc("DELETE /banner/{id}", handlers.HandleTODO)
+	router.HandleFunc(
+		"PATCH /banner/{id}",
+		middlewares.AuthorizeToken(
+			handlers.HandlePatchBanner(
+				ctx,
+				bannerRepo,
+			),
+			api.AdminRole,
+		),
+	)
+	router.HandleFunc(
+		"DELETE /banner/{id}",
+		middlewares.AuthorizeToken(
+			handlers.HandleDeleteBanner(
+				ctx,
+				bannerRepo,
+			),
+			api.AdminRole,
+		),
+	)
 
 	// run server
 	log.Printf("server is listening on port: %s", port)
