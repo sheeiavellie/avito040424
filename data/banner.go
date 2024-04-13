@@ -8,18 +8,18 @@ type UserBannerRequest struct {
 	UseLastRevision bool  `schema:"use_last_revision,default:false"`
 }
 
-type AdminBannerRequest struct {
-	FeatureID int   `schema:"feature_id,required"`
-	TagIDs    []int `schema:"tag_id,required"`
-	Limit     int   `schema:"limit,default:10"`
-	Offset    int   `schema:"offset,default:10"`
+type BannerFilterRequest struct {
+	FeatureIDs []int `schema:"feature_id,required"`
+	TagIDs     []int `schema:"tag_id,required"`
+	Limit      int   `schema:"limit,default:10"`
+	Offset     int   `schema:"offset,default:10"`
 }
 
 type BannerFilter struct {
-	FeatureID int
-	TagIDs    []int
-	Limit     int
-	Offset    int
+	FeatureIDs []int
+	TagIDs     []int
+	Limit      int
+	Offset     int
 }
 
 type Banner struct {
