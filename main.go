@@ -70,7 +70,16 @@ func main() {
 			api.AdminRole,
 		),
 	)
-	router.HandleFunc("POST /banner", handlers.HandleTODO)
+	router.HandleFunc(
+		"POST /banner",
+		middlewares.AuthorizeToken(
+			handlers.HandlePostBanner(
+				ctx,
+				bannerRepo,
+			),
+			api.AdminRole,
+		),
+	)
 	router.HandleFunc("PATCH /banner/{id}", handlers.HandleTODO)
 	router.HandleFunc("DELETE /banner/{id}", handlers.HandleTODO)
 
