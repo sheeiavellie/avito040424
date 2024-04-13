@@ -20,14 +20,14 @@ func HandleGetUserBanner(
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 
 		var bannerReq data.UserBannerRequest
 		if err := schema.NewDecoder().Decode(&bannerReq, r.Form); err != nil {
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)
-			util.SerHTTPErrorBadRequest(w)
+			util.SetHTTPErrorBadRequest(w)
 			return
 		}
 
@@ -41,9 +41,9 @@ func HandleGetUserBanner(
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)
 			switch {
 			case errors.Is(err, storage.ErrorBannerIsNotActive):
-				util.SerHTTPErrorConflict(w)
+				util.SetHTTPErrorConflict(w)
 			default:
-				util.SerHTTPErrorInternalServerError(w)
+				util.SetHTTPErrorInternalServerError(w)
 			}
 			return
 		}
@@ -51,7 +51,7 @@ func HandleGetUserBanner(
 		err = util.WriteJSON(w, http.StatusOK, banner)
 		if err != nil {
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 	}

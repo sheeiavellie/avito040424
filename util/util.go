@@ -5,7 +5,11 @@ import (
 	"net/http"
 )
 
-func SerHTTPErrorBadRequest(w http.ResponseWriter) {
+func SetHTTPStatusNoContent(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func SetHTTPErrorBadRequest(w http.ResponseWriter) {
 	http.Error(
 		w,
 		http.StatusText(http.StatusBadRequest),
@@ -13,7 +17,7 @@ func SerHTTPErrorBadRequest(w http.ResponseWriter) {
 	)
 }
 
-func SerHTTPErrorUnauthorized(w http.ResponseWriter) {
+func SetHTTPErrorUnauthorized(w http.ResponseWriter) {
 	http.Error(
 		w,
 		http.StatusText(http.StatusUnauthorized),
@@ -21,7 +25,7 @@ func SerHTTPErrorUnauthorized(w http.ResponseWriter) {
 	)
 }
 
-func SerHTTPErrorForbidden(w http.ResponseWriter) {
+func SetHTTPErrorForbidden(w http.ResponseWriter) {
 	http.Error(
 		w,
 		http.StatusText(http.StatusForbidden),
@@ -29,7 +33,7 @@ func SerHTTPErrorForbidden(w http.ResponseWriter) {
 	)
 }
 
-func SerHTTPErrorNotFound(w http.ResponseWriter) {
+func SetHTTPErrorNotFound(w http.ResponseWriter) {
 	http.Error(
 		w,
 		http.StatusText(http.StatusNotFound),
@@ -37,7 +41,7 @@ func SerHTTPErrorNotFound(w http.ResponseWriter) {
 	)
 }
 
-func SerHTTPErrorConflict(w http.ResponseWriter) {
+func SetHTTPErrorConflict(w http.ResponseWriter) {
 	http.Error(
 		w,
 		http.StatusText(http.StatusConflict),
@@ -45,7 +49,7 @@ func SerHTTPErrorConflict(w http.ResponseWriter) {
 	)
 }
 
-func SerHTTPErrorInternalServerError(w http.ResponseWriter) {
+func SetHTTPErrorInternalServerError(w http.ResponseWriter) {
 	http.Error(
 		w,
 		http.StatusText(http.StatusInternalServerError),

@@ -22,14 +22,14 @@ func HandleGetBanners(
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
 			log.Printf("an error occur at HandleGetBanners: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 
 		var bannerReq data.BannerFilterRequest
 		if err := schema.NewDecoder().Decode(&bannerReq, r.Form); err != nil {
 			log.Printf("an error occur at HandleGetBanners: %s", err)
-			util.SerHTTPErrorBadRequest(w)
+			util.SetHTTPErrorBadRequest(w)
 			return
 		}
 
@@ -42,14 +42,14 @@ func HandleGetBanners(
 		banners, err := bannerRepo.GetBanners(ctx, filter)
 		if err != nil {
 			log.Printf("an error occur at HandleGetBanners: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 
 		err = util.WriteJSON(w, http.StatusOK, banners)
 		if err != nil {
 			log.Printf("an error occur at HandleGetBanners: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 	}
@@ -71,14 +71,14 @@ func HandlePostBanner(
 
 		if err := util.ReadJSON(r, &bannerReq); err != nil {
 			log.Printf("an error occur at HandlePostBanner: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 
 		if bannerReq.FeatureID == 0 || len(bannerReq.TagIDs) == 0 {
 			err := fmt.Errorf("featureID or tagIDs weren't provided")
 			log.Printf("an error occur at HandlePostBanner: %s", err)
-			util.SerHTTPErrorBadRequest(w)
+			util.SetHTTPErrorBadRequest(w)
 			return
 		}
 
@@ -93,11 +93,11 @@ func HandlePostBanner(
 			log.Printf("an error occur at HandlePostBanner: %s", err)
 			switch {
 			case errors.Is(err, storage.ErrorFeatureOrTagDontExist):
-				util.SerHTTPErrorNotFound(w)
+				util.SetHTTPErrorNotFound(w)
 			case errors.Is(err, storage.ErrorBannerAlreadyExist):
-				util.SerHTTPErrorConflict(w)
+				util.SetHTTPErrorConflict(w)
 			default:
-				util.SerHTTPErrorInternalServerError(w)
+				util.SetHTTPErrorInternalServerError(w)
 			}
 			return
 		}
@@ -106,7 +106,7 @@ func HandlePostBanner(
 		err = util.WriteJSON(w, http.StatusCreated, bannerRes)
 		if err != nil {
 			log.Printf("an error occur at HandlePostBanner: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 	}
@@ -121,26 +121,22 @@ func HandleDeleteBanner(
 		bannerID, err := strconv.Atoi(bannerIDStr)
 		if err != nil || bannerID <= 0 {
 			log.Printf("an error occur at HandleDeleteBanner: %s", err)
-			util.SerHTTPErrorBadRequest(w)
+			util.SetHTTPErrorBadRequest(w)
 			return
 		}
 
-		if err := bannerRepo.DeleteBanner(ctx, bannerID); err != nil {
-			switch {
-			case errors.Is(err, storage.ErrorBannerDontExist):
-				util.SerHTTPErrorNotFound(w)
-			default:
-				util.SerHTTPErrorInternalServerError(w)
-			}
-			return
-		}
+		//if err := bannerRepo.DeleteBanner(ctx, bannerID); err != nil {
+		//	log.Printf("an error occur at HandleDeleteBanner: %s", err)
+		//	switch {
+		//	case errors.Is(err, storage.ErrorBannerDontExist):
+		//		util.SerHTTPErrorNotFound(w)
+		//	default:
+		//		util.SerHTTPErrorInternalServerError(w)
+		//	}
+		//	return
+		//}
 
-		err = util.WriteJSON(w, http.StatusNoContent, "Banner was deleted")
-		if err != nil {
-			log.Printf("an error occur at HandleDeleteBanners: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
-			return
-		}
+		util.SetHTTPStatusNoContent(w)
 	}
 }
 

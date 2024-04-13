@@ -23,14 +23,14 @@ func AuthorizeToken(
 		if tokenHeader == "" {
 			err := fmt.Errorf("token wasn't provided")
 			log.Printf("an error occur at ValidateToken: %s", err)
-			util.SerHTTPErrorUnauthorized(w)
+			util.SetHTTPErrorUnauthorized(w)
 			return
 		}
 
 		tokenStr, err := base64.StdEncoding.DecodeString(tokenHeader)
 		if err != nil {
 			log.Printf("an error occur at ValidateToken: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 
@@ -38,14 +38,14 @@ func AuthorizeToken(
 		err = json.Unmarshal(tokenStr, &token)
 		if err != nil {
 			log.Printf("an error occur at ValidateToken: %s", err)
-			util.SerHTTPErrorInternalServerError(w)
+			util.SetHTTPErrorInternalServerError(w)
 			return
 		}
 
 		if !hasRoleOrAdmin(token.Role, requiredRole.GetName()) {
 			err := fmt.Errorf("wrong role, access forbidden")
 			log.Printf("an error occur at ValidateToken: %s", err)
-			util.SerHTTPErrorForbidden(w)
+			util.SetHTTPErrorForbidden(w)
 			return
 		}
 
