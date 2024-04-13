@@ -57,8 +57,8 @@ func (ps *PostgresStorage) execTx(
 
 	execErr := f(tx)
 	if execErr != nil {
-		txErr := tx.Rollback()
-		return fmt.Errorf("error executing tx: %w, %w", execErr, txErr)
+		_ = tx.Rollback()
+		return fmt.Errorf("error executing tx: %w", execErr)
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -211,9 +211,18 @@ func (ps *PostgresStorage) CreateBanner(
 					isActive,
 				).Scan(&createdBannerID)
 				if err != nil {
-					fmt.Println(err)
-					return err
+					// How ugly is this? ^~^
+					pgerr, ok := err.(*pq.Error)
+
+					switch {
+					case ok && pgerr.Code == pq.ErrorCode("23505"):
+						return ErrorBannerAlreadyExist
+					default:
+						return err
+					}
 				}
+			} else {
+				return ErrorFeatureOrTagDontExist
 			}
 
 			return nil
