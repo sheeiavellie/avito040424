@@ -73,3 +73,27 @@ func (br *bannerRepository) GetBanners(
 	}
 	return banners, nil
 }
+
+func (br *bannerRepository) CreateBanner(
+	ctx context.Context,
+	featureID int,
+	tagIDs []int,
+	content *data.BannerContent,
+	isActive bool,
+) (int, error) {
+	return 0, nil
+}
+
+func (br *bannerRepository) UpdateBanner(
+	ctx context.Context,
+	bannerID int,
+) error {
+	return nil
+}
+
+func (br *bannerRepository) DeleteBanner(
+	ctx context.Context,
+	bannerID int,
+) error {
+	return nil
+}

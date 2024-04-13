@@ -20,8 +20,11 @@ type Storage interface {
 
 	CreateBanner(
 		ctx context.Context,
-		banner *data.BannerContent,
-	) error
+		featureID int,
+		tagIDs []int,
+		content *data.BannerContent,
+		isActive bool,
+	) (int, error)
 
 	UpdateBanner(
 		ctx context.Context,

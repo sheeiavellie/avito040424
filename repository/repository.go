@@ -18,4 +18,22 @@ type BannerRepository interface {
 		ctx context.Context,
 		filter *data.BannerFilter,
 	) ([]data.Banner, error)
+
+	CreateBanner(
+		ctx context.Context,
+		featureID int,
+		tagIDs []int,
+		content *data.BannerContent,
+		isActive bool,
+	) (int, error)
+
+	UpdateBanner(
+		ctx context.Context,
+		bannerID int,
+	) error
+
+	DeleteBanner(
+		ctx context.Context,
+		bannerID int,
+	) error
 }
