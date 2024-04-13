@@ -13,8 +13,8 @@ type UserBannerRequest struct {
 }
 
 type BannerFilterRequest struct {
-	FeatureIDs []int `schema:"feature_id,required"`
-	TagIDs     []int `schema:"tag_id,required"`
+	FeatureIDs []int `schema:"feature_id,default:|"`
+	TagIDs     []int `schema:"tag_id,default:|"`
 	Limit      int   `schema:"limit,default:10"`
 	Offset     int   `schema:"offset,default:0"`
 }
