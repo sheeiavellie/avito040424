@@ -19,12 +19,29 @@ type BannerFilterRequest struct {
 	Offset     int   `schema:"offset,default:0"`
 }
 
+// BannerFilter
+// exists for the sake of more clear API
+// I don't really now if it's important
+// But I don't like the idea of repository that
+// accepts some sort of a request type
+
 type BannerFilter struct {
 	FeatureIDs []int
 	TagIDs     []int
 	Limit      int
 	Offset     int
 }
+
+type BannerContent struct {
+	Title string `json:"title"`
+	Text  string `json:"text"`
+	URL   string `json:"url"`
+}
+
+// Mb cool to rename it into BannerResponse
+// ah, and about TagIDs []string
+// postgres is weird and it will not allow me to easely
+// parse postgres ARRAY into []int for some reasone
 
 type Banner struct {
 	ID        int           `json:"id"`
@@ -36,8 +53,9 @@ type Banner struct {
 	IsActive  bool          `json:"is_active"`
 }
 
-type BannerContent struct {
-	Title string `json:"title"`
-	Text  string `json:"text"`
-	URL   string `json:"url"`
+type BannerRequest struct {
+	FeatureID int           `json:"feature_id"`
+	TagIDs    []int         `json:"tag_ids"`
+	Content   BannerContent `json:"content"`
+	IsActive  bool          `json:"is_active"`
 }
