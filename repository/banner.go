@@ -81,7 +81,18 @@ func (br *bannerRepository) CreateBanner(
 	content *data.BannerContent,
 	isActive bool,
 ) (int, error) {
-	return 0, nil
+	bannerID, err := br.storage.CreateBanner(
+		ctx,
+		featureID,
+		tagIDs,
+		content,
+		isActive,
+	)
+	if err != nil {
+		return 0, fmt.Errorf("can't create banner: %w", err)
+	}
+
+	return bannerID, nil
 }
 
 func (br *bannerRepository) UpdateBanner(

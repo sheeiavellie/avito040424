@@ -64,7 +64,6 @@ func (ps *PostgresStorage) execTx(
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("error executing tx: %w", err)
 	}
-
 	return nil
 }
 
@@ -175,8 +174,10 @@ func (ps *PostgresStorage) CreateBanner(
     ) AS ok;`
 
 	insertQuery := `
-    INSERT INTO banners VALUES
-    ($1, $2, $3, $4, $5, $6, $6, $7)
+    INSERT INTO banners
+    (feature_id, tag_ids, title, text, url, created_at, updated_at, is_active)
+    VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING id;`
 
 	var createdBannerID int
@@ -206,9 +207,11 @@ func (ps *PostgresStorage) CreateBanner(
 					content.Text,
 					content.URL,
 					curTime,
+					curTime,
 					isActive,
 				).Scan(&createdBannerID)
 				if err != nil {
+					fmt.Println(err)
 					return err
 				}
 			}
@@ -220,7 +223,7 @@ func (ps *PostgresStorage) CreateBanner(
 		return 0, fmt.Errorf("error creating banner: %w", err)
 	}
 
-	return 0, nil
+	return createdBannerID, nil
 }
 
 func (ps *PostgresStorage) UpdateBanner(
