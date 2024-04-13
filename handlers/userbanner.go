@@ -24,8 +24,8 @@ func HandleGetUserBanner(
 			return
 		}
 
-		var bannerRequest data.UserBannerRequest
-		if err := schema.NewDecoder().Decode(&bannerRequest, r.Form); err != nil {
+		var bannerReq data.UserBannerRequest
+		if err := schema.NewDecoder().Decode(&bannerReq, r.Form); err != nil {
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)
 			util.SerHTTPErrorBadRequest(w)
 			return
@@ -33,9 +33,9 @@ func HandleGetUserBanner(
 
 		banner, err := bannerRepo.GetBannerContent(
 			ctx,
-			bannerRequest.FeatureID,
-			bannerRequest.TagIDs,
-			bannerRequest.UseLastRevision,
+			bannerReq.FeatureID,
+			bannerReq.TagIDs,
+			bannerReq.UseLastRevision,
 		)
 		if err != nil {
 			log.Printf("an error occur at HandleGetUserBanner: %s", err)

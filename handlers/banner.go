@@ -22,18 +22,18 @@ func HandleGetBanners(
 			return
 		}
 
-		var bannerRequest data.BannerFilterRequest
-		if err := schema.NewDecoder().Decode(&bannerRequest, r.Form); err != nil {
+		var bannerReq data.BannerFilterRequest
+		if err := schema.NewDecoder().Decode(&bannerReq, r.Form); err != nil {
 			log.Printf("an error occur at HandleGetBanners: %s", err)
 			util.SerHTTPErrorBadRequest(w)
 			return
 		}
 
 		filter := &data.BannerFilter{
-			FeatureIDs: bannerRequest.FeatureIDs,
-			TagIDs:     bannerRequest.TagIDs,
-			Limit:      bannerRequest.Limit,
-			Offset:     bannerRequest.Offset,
+			FeatureIDs: bannerReq.FeatureIDs,
+			TagIDs:     bannerReq.TagIDs,
+			Limit:      bannerReq.Limit,
+			Offset:     bannerReq.Offset,
 		}
 		banners, err := bannerRepo.GetBanners(ctx, filter)
 		if err != nil {
