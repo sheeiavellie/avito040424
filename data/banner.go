@@ -1,6 +1,10 @@
 package data
 
-import _ "github.com/gorilla/schema"
+import (
+	"time"
+
+	_ "github.com/gorilla/schema"
+)
 
 type UserBannerRequest struct {
 	FeatureID       int   `schema:"feature_id,required"`
@@ -12,7 +16,7 @@ type BannerFilterRequest struct {
 	FeatureIDs []int `schema:"feature_id,required"`
 	TagIDs     []int `schema:"tag_id,required"`
 	Limit      int   `schema:"limit,default:10"`
-	Offset     int   `schema:"offset,default:10"`
+	Offset     int   `schema:"offset,default:0"`
 }
 
 type BannerFilter struct {
@@ -25,8 +29,10 @@ type BannerFilter struct {
 type Banner struct {
 	ID        int           `json:"id"`
 	FeatureID int           `json:"feature_id"`
-	TagIDs    []int         `json:"tag_ids"`
+	TagIDs    []string      `json:"tag_ids"`
 	Content   BannerContent `json:"content"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
 	IsActive  bool          `json:"is_active"`
 }
 
