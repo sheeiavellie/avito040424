@@ -7,8 +7,9 @@ import (
 )
 
 type BannerRepository interface {
-	GetBanner(
+	GetBannerContent(
 		ctx context.Context,
-		bannerRequest *data.UserBannerRequest,
-	) (*data.Banner, error)
+		featureID int,
+		tagIDs []int,
+	) (*data.BannerContent, error)
 }
