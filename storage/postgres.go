@@ -73,18 +73,23 @@ func (ps *PostgresStorage) GetBannerContent(
 	tagIDs []int,
 ) (*data.BannerContent, error) {
 	query := `
-    SELECT title, text, url FROM banners WHERE feature_id = $1 AND
+    SELECT title, text, url, is_active FROM banners WHERE feature_id = $1 AND
     (tag_ids <@ $2 and tag_ids @> $2);`
 
 	var banner data.BannerContent
+	var isActive bool
 	err := ps.db.QueryRowContext(
 		ctx,
 		query,
 		featureID,
 		pq.Array(tagIDs),
-	).Scan(&banner.Title, &banner.Text, &banner.URL)
+	).Scan(&banner.Title, &banner.Text, &banner.URL, &isActive)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
+	}
+
+	if !isActive {
+		return nil, ErrorBannerIsNotActive
 	}
 
 	return &banner, nil
