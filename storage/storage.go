@@ -29,6 +29,10 @@ type Storage interface {
 	UpdateBanner(
 		ctx context.Context,
 		bannerID int,
+		featureID int,
+		tagIDs []int,
+		content *data.BannerContent,
+		isActive bool,
 	) error
 
 	DeleteBanner(
