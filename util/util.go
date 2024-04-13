@@ -37,6 +37,14 @@ func SerHTTPErrorNotFound(w http.ResponseWriter) {
 	)
 }
 
+func SerHTTPErrorConflict(w http.ResponseWriter) {
+	http.Error(
+		w,
+		http.StatusText(http.StatusConflict),
+		http.StatusConflict,
+	)
+}
+
 func SerHTTPErrorInternalServerError(w http.ResponseWriter) {
 	http.Error(
 		w,
