@@ -20,7 +20,7 @@ func HandleGetUserBanner(
 	bannerRepo repository.BannerRepository,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
 
 		done := make(chan struct{})
