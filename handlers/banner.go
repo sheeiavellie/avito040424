@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/gorilla/schema"
 	"github.com/sheeiavellie/avito040424/data"
@@ -119,9 +120,16 @@ func HandleDeleteBanner(
 	return func(w http.ResponseWriter, r *http.Request) {
 		bannerIDStr := r.PathValue("id")
 		bannerID, err := strconv.Atoi(bannerIDStr)
-		if err != nil || bannerID <= 0 {
-			log.Printf("an error occur at HandleDeleteBanner: %s", err)
-			util.SetHTTPErrorBadRequest(w)
+		if err != nil {
+			switch {
+			case bannerID <= 0:
+				err = fmt.Errorf("banner id can't be less than 1")
+				log.Printf("an error occur at HandlePatchBanner: %s", err)
+				util.SetHTTPErrorBadRequest(w)
+			default:
+				log.Printf("an error occur at HandlePatchBanner: %s", err)
+				util.SetHTTPErrorInternalServerError(w)
+			}
 			return
 		}
 
@@ -145,5 +153,57 @@ func HandlePatchBanner(
 	bannerRepo repository.BannerRepository,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		bannerIDStr := r.PathValue("id")
+		bannerID, err := strconv.Atoi(bannerIDStr)
+		if err != nil {
+			switch {
+			case bannerID <= 0:
+				err = fmt.Errorf("banner id can't be less than 1")
+				log.Printf("an error occur at HandlePatchBanner: %s", err)
+				util.SetHTTPErrorBadRequest(w)
+			default:
+				log.Printf("an error occur at HandlePatchBanner: %s", err)
+				util.SetHTTPErrorInternalServerError(w)
+			}
+			return
+		}
+
+		bannerChan := make(chan *data.BannerPatchRequest)
+		var errPatch error
+		var wg sync.WaitGroup
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			err := bannerRepo.UpdateBanner(ctx, bannerID, bannerChan)
+			if err != nil {
+				close(bannerChan)
+				errPatch = err
+			}
+		}()
+
+		if existingBanner, ok := <-bannerChan; ok {
+			if err := util.ReadJSON(r, existingBanner); err != nil {
+				log.Printf("an error occur at HandlePatchBanner: %s", err)
+				util.SetHTTPErrorInternalServerError(w)
+				return
+			}
+			bannerChan <- existingBanner
+		}
+
+		wg.Wait()
+		if errPatch != nil {
+			log.Printf("an error occur at HandlePatchBanner: %s", errPatch)
+			switch {
+			case errors.Is(errPatch, storage.ErrorBannerDontExist):
+				util.SetHTTPErrorNotFound(w)
+			case errors.Is(errPatch, storage.ErrorBannerAlreadyExist):
+				util.SetHTTPErrorConflict(w)
+			default:
+				util.SetHTTPErrorInternalServerError(w)
+			}
+			return
+		}
 	}
 }
