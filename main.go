@@ -46,6 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("postgres can't be created: %s", err)
 	}
+	postgresStorage.Init(ctx)
 	defer postgresStorage.Close()
 
 	lruCache := storage.NewLRUCacheStorage(100)

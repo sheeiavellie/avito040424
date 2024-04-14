@@ -39,6 +39,49 @@ func NewPostgresStorage(
 	}, nil
 }
 
+func (ps *PostgresStorage) Init(
+	ctx context.Context,
+
+) error {
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	query := `
+    CREATE TABLE IF NOT EXISTS features (
+    	id SERIAL PRIMARY KEY
+    );
+    
+    CREATE TABLE IF NOT EXISTS tags (
+    	id SERIAL PRIMARY KEY
+    );
+    
+    CREATE TABLE IF NOT EXISTS banners(
+    	id SERIAL PRIMARY KEY,
+    	feature_id INT NOT NULL,
+    	tag_ids INT[] NOT NULL,
+    	title VARCHAR(255) NOT NULL,
+      	text TEXT NOT NULL,
+    	url TEXT NOT NULL,
+    	created_at TIMESTAMP NOT NULL,
+    	updated_at TIMESTAMP NOT NULL,
+    	is_active BOOLEAN NOT NULL
+    );
+    
+    CREATE INDEX IF NOT EXISTS ix_banners_id ON banners (id);
+    CREATE INDEX IF NOT EXISTS ix_banners_feature_id ON banners (feature_id);
+    CREATE INDEX IF NOT EXISTS ix_banners_tag_ids ON banners USING gin(tag_ids);`
+
+	_, err := ps.db.ExecContext(
+		ctx,
+		query,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (ps *PostgresStorage) Close() error {
 	err := ps.db.Close()
 	return fmt.Errorf("error closing db: %w", err)
