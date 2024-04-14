@@ -30,10 +30,7 @@ type BannerRepository interface {
 	UpdateBanner(
 		ctx context.Context,
 		bannerID int,
-		featureID int,
-		tagIDs []int,
-		content *data.BannerContent,
-		isActive bool,
+		bannerChan chan *data.BannerPatchRequest,
 	) error
 
 	DeleteBanner(

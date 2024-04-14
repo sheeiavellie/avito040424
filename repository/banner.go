@@ -107,11 +107,17 @@ func (br *bannerRepository) CreateBanner(
 func (br *bannerRepository) UpdateBanner(
 	ctx context.Context,
 	bannerID int,
-	featureID int,
-	tagIDs []int,
-	content *data.BannerContent,
-	isActive bool,
+	bannerChan chan *data.BannerPatchRequest,
 ) error {
+	err := br.storage.UpdateBanner(
+		ctx,
+		bannerID,
+		bannerChan,
+	)
+	if err != nil {
+		return fmt.Errorf("can't update banner: %w", err)
+	}
+
 	return nil
 }
 
