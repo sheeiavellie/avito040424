@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/gorilla/schema"
 	"github.com/sheeiavellie/avito040424/data"
@@ -21,6 +22,9 @@ func HandleGetBanners(
 	bannerRepo repository.BannerRepository,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
 		if err := r.ParseForm(); err != nil {
 			log.Printf("an error occur at HandleGetBanners: %s", err)
 			util.SetHTTPErrorInternalServerError(w)
@@ -61,6 +65,9 @@ func HandlePostBanner(
 	bannerRepo repository.BannerRepository,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
 		bannerReq := data.BannerRequest{
 			Content: data.BannerContent{
 				Title: "default",
@@ -118,6 +125,9 @@ func HandleDeleteBanner(
 	bannerRepo repository.BannerRepository,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
 		bannerIDStr := r.PathValue("id")
 		bannerID, err := strconv.Atoi(bannerIDStr)
 		if err != nil {
@@ -153,6 +163,9 @@ func HandlePatchBanner(
 	bannerRepo repository.BannerRepository,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
 		bannerIDStr := r.PathValue("id")
 		bannerID, err := strconv.Atoi(bannerIDStr)
 		if err != nil {
