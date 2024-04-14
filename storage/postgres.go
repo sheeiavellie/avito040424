@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/lib/pq"
@@ -213,7 +214,6 @@ func (ps *PostgresStorage) CreateBanner(
 				if err != nil {
 					// How ugly is this? ^~^
 					pgerr, ok := err.(*pq.Error)
-
 					switch {
 					case ok && pgerr.Code == pq.ErrorCode("23505"):
 						return ErrorBannerAlreadyExist
@@ -238,43 +238,73 @@ func (ps *PostgresStorage) CreateBanner(
 func (ps *PostgresStorage) UpdateBanner(
 	ctx context.Context,
 	bannerID int,
-	featureID int,
-	tagIDs []int,
-	content *data.BannerContent,
-	isActive bool,
+	bannerChan chan *data.BannerPatchRequest,
 ) error {
 	checkQuery := `
-    SELECT true FROM banners WHERE id = $1;`
+    SELECT feature_id, tag_ids, title, text, url, is_active
+    FROM banners WHERE id = $1;`
 
 	updateQuery := `
-    ;`
+    UPDATE banners SET
+    feature_id=$1, tag_ids=$2, title=$3, text=$4, url=$5, is_active=$6,
+    updated_at=$7
+    WHERE id=$8 RETURNING id;`
 
+	var existingBanner data.BannerPatchRequest
 	var updatedBannerID int
 	err := ps.execTx(
 		ctx,
 		&sql.TxOptions{Isolation: sql.LevelReadCommitted},
 		func(tx *sql.Tx) error {
-			var ok bool
+
+			tagIDsStr := make([]string, 0, 3)
+
 			err := tx.QueryRowContext(
 				ctx,
 				checkQuery,
 				bannerID,
-			).Scan(&ok)
+			).Scan(
+				&existingBanner.FeatureID,
+				pq.Array(&tagIDsStr),
+				&existingBanner.Content.Title,
+				&existingBanner.Content.Text,
+				&existingBanner.Content.URL,
+				&existingBanner.IsActive,
+			)
 			if err != nil {
-				return err
+				return ErrorBannerDontExist
 			}
 
-			if ok {
-				// updatedBannerID mb useful for error check
-				err := tx.QueryRowContext(
-					ctx,
-					updateQuery,
-				).Scan(&updatedBannerID)
-				if err != nil {
+			for _, s := range tagIDsStr {
+				num, _ := strconv.Atoi(s) //no need to check error here
+				existingBanner.TagIDs = append(existingBanner.TagIDs, num)
+			}
+
+			bannerChan <- &existingBanner
+			updateBanner := <-bannerChan
+
+			// updatedBannerID mb useful for error check
+			err = tx.QueryRowContext(
+				ctx,
+				updateQuery,
+				updateBanner.FeatureID,
+				pq.Array(updateBanner.TagIDs),
+				updateBanner.Content.Title,
+				updateBanner.Content.Text,
+				updateBanner.Content.URL,
+				updateBanner.IsActive,
+				time.Now(),
+				bannerID,
+			).Scan(&updatedBannerID)
+			if err != nil {
+				// How ugly is this? ^~^
+				pgerr, ok := err.(*pq.Error)
+				switch {
+				case ok && pgerr.Code == pq.ErrorCode("23505"):
+					return ErrorBannerAlreadyExist
+				default:
 					return err
 				}
-			} else {
-				return ErrorBannerDontExist
 			}
 
 			return nil
