@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/sheeiavellie/avito040424/api"
@@ -13,6 +14,10 @@ import (
 	"github.com/sheeiavellie/avito040424/middlewares"
 	"github.com/sheeiavellie/avito040424/repository"
 	"github.com/sheeiavellie/avito040424/storage"
+)
+
+const (
+	userRequestTimeout = 3 * time.Second
 )
 
 func main() {
@@ -55,6 +60,7 @@ func main() {
 		middlewares.AuthorizeToken(
 			handlers.HandleGetUserBanner(
 				ctx,
+				userRequestTimeout,
 				bannerRepo,
 			),
 			api.UserRole,
