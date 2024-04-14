@@ -94,7 +94,7 @@ func HandlePostBanner(
 			log.Printf("an error occur at HandlePostBanner: %s", err)
 			switch {
 			case errors.Is(err, storage.ErrorFeatureOrTagDontExist):
-				util.SetHTTPErrorNotFound(w)
+				util.SetHTTPErrorBadRequest(w)
 			case errors.Is(err, storage.ErrorBannerAlreadyExist):
 				util.SetHTTPErrorConflict(w)
 			default:
@@ -196,6 +196,8 @@ func HandlePatchBanner(
 		if errPatch != nil {
 			log.Printf("an error occur at HandlePatchBanner: %s", errPatch)
 			switch {
+			case errors.Is(errPatch, storage.ErrorFeatureOrTagDontExist):
+				util.SetHTTPErrorBadRequest(w)
 			case errors.Is(errPatch, storage.ErrorBannerDontExist):
 				util.SetHTTPErrorNotFound(w)
 			case errors.Is(errPatch, storage.ErrorBannerAlreadyExist):

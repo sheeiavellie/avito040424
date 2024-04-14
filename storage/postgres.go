@@ -240,9 +240,23 @@ func (ps *PostgresStorage) UpdateBanner(
 	bannerID int,
 	bannerChan chan *data.BannerPatchRequest,
 ) error {
-	checkQuery := `
+	getQuery := `
     SELECT feature_id, tag_ids, title, text, url, is_active
     FROM banners WHERE id = $1;`
+
+	checkQuery := `
+    SELECT
+    (
+        NOT EXISTS (
+            SELECT $1 EXCEPT
+            SELECT id FROM features
+        )
+        AND
+        NOT EXISTS (
+            SELECT unnest($2::int[]) EXCEPT
+            SELECT id FROM tags
+        )
+    ) AS ok;`
 
 	updateQuery := `
     UPDATE banners SET
@@ -252,16 +266,16 @@ func (ps *PostgresStorage) UpdateBanner(
 
 	var existingBanner data.BannerPatchRequest
 	var updatedBannerID int
+	var ok bool
 	err := ps.execTx(
 		ctx,
 		&sql.TxOptions{Isolation: sql.LevelReadCommitted},
 		func(tx *sql.Tx) error {
-
 			tagIDsStr := make([]string, 0, 3)
 
 			err := tx.QueryRowContext(
 				ctx,
-				checkQuery,
+				getQuery,
 				bannerID,
 			).Scan(
 				&existingBanner.FeatureID,
@@ -282,6 +296,19 @@ func (ps *PostgresStorage) UpdateBanner(
 
 			bannerChan <- &existingBanner
 			updateBanner := <-bannerChan
+
+			err = tx.QueryRowContext(
+				ctx,
+				checkQuery,
+				updateBanner.FeatureID,
+				pq.Array(updateBanner.TagIDs),
+			).Scan(&ok)
+			if err != nil {
+				return err
+			}
+			if !ok {
+				return ErrorFeatureOrTagDontExist
+			}
 
 			// updatedBannerID mb useful for error check
 			err = tx.QueryRowContext(
