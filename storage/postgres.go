@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -86,7 +87,12 @@ func (ps *PostgresStorage) GetBannerContent(
 		pq.Array(tagIDs),
 	).Scan(&banner.Title, &banner.Text, &banner.URL, &isActive)
 	if err != nil {
-		return nil, fmt.Errorf("error executing query: %w", err)
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrorBannerDontExist
+		default:
+			return nil, fmt.Errorf("error executing query: %w", err)
+		}
 	}
 
 	if !isActive {
