@@ -60,6 +60,13 @@ type BannerRequest struct {
 	IsActive  bool          `json:"is_active"`
 }
 
+type BannerPatchRequest struct {
+	FeatureID int           `json:"feature_id"`
+	TagIDs    []int         `json:"tag_ids"`
+	Content   BannerContent `json:"content"`
+	IsActive  bool          `json:"is_active"`
+}
+
 type CreateBannerResponse struct {
 	BannerID int `json:"banner_id"`
 }
