@@ -243,6 +243,47 @@ func (ps *PostgresStorage) UpdateBanner(
 	content *data.BannerContent,
 	isActive bool,
 ) error {
+	checkQuery := `
+    SELECT true FROM banners WHERE id = $1;`
+
+	updateQuery := `
+    ;`
+
+	var updatedBannerID int
+	err := ps.execTx(
+		ctx,
+		&sql.TxOptions{Isolation: sql.LevelReadCommitted},
+		func(tx *sql.Tx) error {
+			var ok bool
+			err := tx.QueryRowContext(
+				ctx,
+				checkQuery,
+				bannerID,
+			).Scan(&ok)
+			if err != nil {
+				return err
+			}
+
+			if ok {
+				// updatedBannerID mb useful for error check
+				err := tx.QueryRowContext(
+					ctx,
+					updateQuery,
+				).Scan(&updatedBannerID)
+				if err != nil {
+					return err
+				}
+			} else {
+				return ErrorBannerDontExist
+			}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("error deleting banner: %w", err)
+	}
+
 	return nil
 }
 
@@ -253,7 +294,8 @@ func (ps *PostgresStorage) DeleteBanner(
 	checkQuery := `
     SELECT true FROM banners WHERE id = $1;`
 
-	deleteQuery := `DELETE FROM banners WHERE id = $1 RETURNING id;`
+	deleteQuery := `
+    DELETE FROM banners WHERE id = $1 RETURNING id;`
 
 	var deletedBannerID int
 	err := ps.execTx(
