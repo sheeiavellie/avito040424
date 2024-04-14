@@ -41,6 +41,14 @@ func SetHTTPErrorNotFound(w http.ResponseWriter) {
 	)
 }
 
+func SetHTTPErrorRequestTimeout(w http.ResponseWriter) {
+	http.Error(
+		w,
+		http.StatusText(http.StatusRequestTimeout),
+		http.StatusRequestTimeout,
+	)
+}
+
 func SetHTTPErrorConflict(w http.ResponseWriter) {
 	http.Error(
 		w,
